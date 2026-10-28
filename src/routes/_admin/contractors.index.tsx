@@ -10,7 +10,7 @@ import { exportCsv } from "@/lib/exporters";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_admin/contractors/")({
-  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : undefined }),
+  validateSearch: (s: Record<string, unknown>): { q?: string } => (typeof s["q"] === "string" ? { q: s["q"] as string } : {}),
   head: () => ({ meta: [{ title: "Contractors — CubeSites Super Admin" }, { name: "description", content: "Search and manage contractor accounts." }, { property: "og:title", content: "Contractors — CubeSites Super Admin" }, { property: "og:description", content: "Search and manage contractor accounts." }] }),
   component: Contractors,
 });
