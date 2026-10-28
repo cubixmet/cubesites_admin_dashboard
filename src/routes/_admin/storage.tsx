@@ -13,7 +13,7 @@ import type { StorageSnapshot } from "@/lib/types";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_admin/storage")({
-  validateSearch: (s: Record<string, unknown>) => ({ c: typeof s.c === "string" ? s.c : undefined }),
+  validateSearch: (s: Record<string, unknown>): { c?: string } => (typeof s["c"] === "string" ? { c: s["c"] as string } : {}),
   head: () => ({ meta: [{ title: "Storage Billing — CubeSites Super Admin" }, { name: "description", content: "Daily storage snapshots, monthly averages and storage charges." }, { property: "og:title", content: "Storage Billing — CubeSites Super Admin" }, { property: "og:description", content: "Daily storage snapshots, monthly averages and storage charges." }] }),
   component: Storage,
 });
