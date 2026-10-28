@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tan
 import { useEffect, useState } from "react";
 import {
   Activity, Bell, Building2, CreditCard, Database, FileText, HardDrive, Headphones, LayoutDashboard, LogOut, Menu,
-  Percent, RotateCcw, Search, Settings, ShieldCheck, Users, Wallet, MapPin,
+  Percent, RotateCcw, Search, Settings, ShieldCheck, Users, MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -153,8 +153,6 @@ function AdminLayout() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      {/* Wallet icon kept for future billing nav */}
-      <Wallet className="hidden" aria-hidden />
     </div>
   );
 }
