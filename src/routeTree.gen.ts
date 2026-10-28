@@ -13,7 +13,9 @@ import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AdminIndexRouteImport } from './routes/_admin/index'
 import { Route as AdminActivityRouteImport } from './routes/_admin/activity'
+import { Route as AdminNotificationsRouteImport } from './routes/_admin/notifications'
 import { Route as AdminPaymentsRouteImport } from './routes/_admin/payments'
+import { Route as AdminSettingsRouteImport } from './routes/_admin/settings'
 import { Route as AdminSitesRouteImport } from './routes/_admin/sites'
 import { Route as AdminStaffRouteImport } from './routes/_admin/staff'
 import { Route as AdminStorageRouteImport } from './routes/_admin/storage'
@@ -23,6 +25,8 @@ import { Route as AdminBackupsIndexRouteImport } from './routes/_admin/backups.i
 import { Route as AdminBackupsIdRouteImport } from './routes/_admin/backups.$id'
 import { Route as AdminContractorsIndexRouteImport } from './routes/_admin/contractors.index'
 import { Route as AdminContractorsIdRouteImport } from './routes/_admin/contractors.$id'
+import { Route as AdminSupportIndexRouteImport } from './routes/_admin/support.index'
+import { Route as AdminSupportIdRouteImport } from './routes/_admin/support.$id'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/_admin',
@@ -43,9 +47,19 @@ const AdminActivityRoute = AdminActivityRouteImport.update({
   path: '/activity',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSitesRoute = AdminSitesRouteImport.update({
@@ -93,12 +107,24 @@ const AdminContractorsIdRoute = AdminContractorsIdRouteImport.update({
   path: '/contractors/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSupportIndexRoute = AdminSupportIndexRouteImport.update({
+  id: '/support/',
+  path: '/support/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSupportIdRoute = AdminSupportIdRouteImport.update({
+  id: '/support/$id',
+  path: '/support/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AdminIndexRoute
   '/login': typeof LoginRoute
   '/activity': typeof AdminActivityRoute
+  '/notifications': typeof AdminNotificationsRoute
   '/payments': typeof AdminPaymentsRoute
+  '/settings': typeof AdminSettingsRoute
   '/sites': typeof AdminSitesRoute
   '/staff': typeof AdminStaffRoute
   '/storage': typeof AdminStorageRoute
@@ -106,13 +132,17 @@ export interface FileRoutesByFullPath {
   '/tax': typeof AdminTaxRoute
   '/backups/$id': typeof AdminBackupsIdRoute
   '/contractors/$id': typeof AdminContractorsIdRoute
+  '/support/$id': typeof AdminSupportIdRoute
   '/backups/': typeof AdminBackupsIndexRoute
   '/contractors/': typeof AdminContractorsIndexRoute
+  '/support/': typeof AdminSupportIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/activity': typeof AdminActivityRoute
+  '/notifications': typeof AdminNotificationsRoute
   '/payments': typeof AdminPaymentsRoute
+  '/settings': typeof AdminSettingsRoute
   '/sites': typeof AdminSitesRoute
   '/staff': typeof AdminStaffRoute
   '/storage': typeof AdminStorageRoute
@@ -121,15 +151,19 @@ export interface FileRoutesByTo {
   '/': typeof AdminIndexRoute
   '/backups/$id': typeof AdminBackupsIdRoute
   '/contractors/$id': typeof AdminContractorsIdRoute
+  '/support/$id': typeof AdminSupportIdRoute
   '/backups': typeof AdminBackupsIndexRoute
   '/contractors': typeof AdminContractorsIndexRoute
+  '/support': typeof AdminSupportIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
   '/_admin/activity': typeof AdminActivityRoute
+  '/_admin/notifications': typeof AdminNotificationsRoute
   '/_admin/payments': typeof AdminPaymentsRoute
+  '/_admin/settings': typeof AdminSettingsRoute
   '/_admin/sites': typeof AdminSitesRoute
   '/_admin/staff': typeof AdminStaffRoute
   '/_admin/storage': typeof AdminStorageRoute
@@ -138,8 +172,10 @@ export interface FileRoutesById {
   '/_admin/': typeof AdminIndexRoute
   '/_admin/backups/$id': typeof AdminBackupsIdRoute
   '/_admin/contractors/$id': typeof AdminContractorsIdRoute
+  '/_admin/support/$id': typeof AdminSupportIdRoute
   '/_admin/backups/': typeof AdminBackupsIndexRoute
   '/_admin/contractors/': typeof AdminContractorsIndexRoute
+  '/_admin/support/': typeof AdminSupportIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -147,7 +183,9 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/activity'
+    | '/notifications'
     | '/payments'
+    | '/settings'
     | '/sites'
     | '/staff'
     | '/storage'
@@ -155,13 +193,17 @@ export interface FileRouteTypes {
     | '/tax'
     | '/backups/$id'
     | '/contractors/$id'
+    | '/support/$id'
     | '/backups/'
     | '/contractors/'
+    | '/support/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/activity'
+    | '/notifications'
     | '/payments'
+    | '/settings'
     | '/sites'
     | '/staff'
     | '/storage'
@@ -170,14 +212,18 @@ export interface FileRouteTypes {
     | '/'
     | '/backups/$id'
     | '/contractors/$id'
+    | '/support/$id'
     | '/backups'
     | '/contractors'
+    | '/support'
   id:
     | '__root__'
     | '/_admin'
     | '/login'
     | '/_admin/activity'
+    | '/_admin/notifications'
     | '/_admin/payments'
+    | '/_admin/settings'
     | '/_admin/sites'
     | '/_admin/staff'
     | '/_admin/storage'
@@ -186,8 +232,10 @@ export interface FileRouteTypes {
     | '/_admin/'
     | '/_admin/backups/$id'
     | '/_admin/contractors/$id'
+    | '/_admin/support/$id'
     | '/_admin/backups/'
     | '/_admin/contractors/'
+    | '/_admin/support/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -225,11 +273,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminActivityRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/notifications': {
+      id: '/_admin/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/payments': {
       id: '/_admin/payments'
       path: '/payments'
       fullPath: '/payments'
       preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/settings': {
+      id: '/_admin/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_admin/sites': {
@@ -295,12 +357,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContractorsIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/support/': {
+      id: '/_admin/support/'
+      path: '/support'
+      fullPath: '/support/'
+      preLoaderRoute: typeof AdminSupportIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/support/$id': {
+      id: '/_admin/support/$id'
+      path: '/support/$id'
+      fullPath: '/support/$id'
+      preLoaderRoute: typeof AdminSupportIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
   AdminActivityRoute: typeof AdminActivityRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSitesRoute: typeof AdminSitesRoute
   AdminStaffRoute: typeof AdminStaffRoute
   AdminStorageRoute: typeof AdminStorageRoute
@@ -309,13 +387,17 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBackupsIdRoute: typeof AdminBackupsIdRoute
   AdminContractorsIdRoute: typeof AdminContractorsIdRoute
+  AdminSupportIdRoute: typeof AdminSupportIdRoute
   AdminBackupsIndexRoute: typeof AdminBackupsIndexRoute
   AdminContractorsIndexRoute: typeof AdminContractorsIndexRoute
+  AdminSupportIndexRoute: typeof AdminSupportIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminActivityRoute: AdminActivityRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   AdminSitesRoute: AdminSitesRoute,
   AdminStaffRoute: AdminStaffRoute,
   AdminStorageRoute: AdminStorageRoute,
@@ -324,8 +406,10 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminBackupsIdRoute: AdminBackupsIdRoute,
   AdminContractorsIdRoute: AdminContractorsIdRoute,
+  AdminSupportIdRoute: AdminSupportIdRoute,
   AdminBackupsIndexRoute: AdminBackupsIndexRoute,
   AdminContractorsIndexRoute: AdminContractorsIndexRoute,
+  AdminSupportIndexRoute: AdminSupportIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
