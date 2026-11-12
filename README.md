@@ -10,7 +10,7 @@ TanStack Start (React 19, TypeScript, Vite), TanStack Router (file routes — us
 
 ## Structure
 - `src/lib/types.ts` — typed data models (API contract draft)
-- `src/lib/mock/seed.ts` — deterministic centralized mock dataset (Kerala contractors, demo date 28 Oct 2026)
+- `src/lib/mock/seed.ts` — deterministic mock dataset for local UI (demo contractors / cities; product is region-agnostic; demo date 28 Oct 2026)
 - `src/lib/store.ts` — mock service layer; all admin actions + audit logging; persisted to localStorage; `resetDemo()`
 - `src/lib/billing.ts` — pure pricing/storage/tax/proration math (+ `billing.test.ts`)
 - `src/lib/selectors.ts` — derived dashboard metrics and per-contractor bills

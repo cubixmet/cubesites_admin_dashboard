@@ -1,4 +1,4 @@
-// Typed data models for the CubeSites Super Admin portal.
+// Typed data models for the CuboSites Super Admin portal.
 // These mirror the shapes the future backend API is expected to return.
 
 export type ContractorStatus = "active" | "suspended" | "expired";
@@ -221,6 +221,30 @@ export interface AdminSettings {
   ops: { backupHourIst: number; reminderDays: number[]; maintenanceBanner: string };
 }
 
+/** Workspace prepaid wallet. Amounts in rupees in the admin UI (API uses paise). */
+export type WalletFunding = "free" | "paid";
+export interface Wallet {
+  contractorId: string;
+  balance: number;
+  paidRecharged: number;
+  freeRecharged: number;
+  updatedAt: string;
+}
+export interface WalletTransaction {
+  id: string;
+  contractorId: string;
+  amount: number;
+  kind: "recharge" | "debit" | "adjustment";
+  funding: WalletFunding;
+  source: "admin" | "razorpay" | "system";
+  note: string;
+  reference: string;
+  balanceAfter: number;
+  countsAsIncome: boolean;
+  createdBy: string;
+  createdAt: string;
+}
+
 export interface DataState {
   contractors: Contractor[];
   sites: Site[];
@@ -238,4 +262,6 @@ export interface DataState {
   retention: RetentionNotice[];
   support: SupportCase[];
   settings: AdminSettings;
+  wallets: Wallet[];
+  walletTransactions: WalletTransaction[];
 }

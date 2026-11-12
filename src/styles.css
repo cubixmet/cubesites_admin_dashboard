@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * CubeSites Super Admin design system — white + restrained construction green.
+ * CuboSites Super Admin design system — white + restrained construction green.
  * All colors are oklch semantic tokens; components never use raw color classes.
  */
 

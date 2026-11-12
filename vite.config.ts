@@ -9,6 +9,8 @@ import { buildInfoPlugin } from "./vite.build-info";
 
 export default defineConfig({
   plugins: [buildInfoPlugin("cubesites-admin")],
+  // VPS deploy (admin.cubosites.com) — Node listener behind nginx
+  nitro: { preset: "node-server" },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

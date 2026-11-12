@@ -1,16 +1,49 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
-  Activity, Bell, Building2, CreditCard, Database, FileText, HardDrive, Headphones, LayoutDashboard, LogOut, Menu,
-  Percent, RotateCcw, Search, Settings, ShieldCheck, Users, MapPin,
+  Activity,
+  Bell,
+  Building2,
+  CreditCard,
+  Database,
+  FileText,
+  HardDrive,
+  Headphones,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Percent,
+  RotateCcw,
+  Search,
+  Settings,
+  Users,
+  MapPin,
+  Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { demoLogout, getSession, type Session } from "@/lib/auth";
-import { actions, useData } from "@/lib/store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { demoLogout, getSession, restoreAdminSession, type Session } from "@/lib/auth";
+import { actions, hydrateAdminStore, useData } from "@/lib/store";
+import { apiEnabled } from "@/lib/api";
 import { fmtDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -24,6 +57,7 @@ const NAV = [
   { to: "/staff", label: "Staff", icon: Users },
   { to: "/subscriptions", label: "Subscriptions", icon: FileText },
   { to: "/payments", label: "Payments", icon: CreditCard },
+  { to: "/wallets", label: "Wallets", icon: Wallet },
   { to: "/storage", label: "Storage Billing", icon: Database },
   { to: "/tax", label: "Tax Configuration", icon: Percent },
   { to: "/backups", label: "Google Drive & Backups", icon: HardDrive },
@@ -41,11 +75,22 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
       {NAV.map((n) => {
         const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
         return (
-          <Link key={n.to} to={n.to} onClick={onNavigate}
-            className={cn("flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm text-sidebar-foreground hover:bg-sidebar-accent", active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground")}>
+          <Link
+            key={n.to}
+            to={n.to}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm text-sidebar-foreground hover:bg-sidebar-accent",
+              active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
+            )}
+          >
             <n.icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground")} />
             <span className="flex-1 truncate">{n.label}</span>
-            {n.to === "/notifications" && unread > 0 && <span className="num rounded bg-primary px-1.5 text-[10px] text-primary-foreground">{unread}</span>}
+            {n.to === "/notifications" && unread > 0 && (
+              <span className="num rounded bg-primary px-1.5 text-[10px] text-primary-foreground">
+                {unread}
+              </span>
+            )}
           </Link>
         );
       })}
@@ -55,11 +100,14 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 
 function Brand() {
   return (
-    <div className="flex h-14 items-center gap-2 border-b px-4">
-      <div className="grid h-7 w-7 place-items-center rounded bg-primary text-primary-foreground"><ShieldCheck className="h-4 w-4" /></div>
-      <div className="leading-tight">
-        <div className="text-sm font-semibold">CubeSites</div>
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Super Admin</div>
+    <div className="flex h-14 flex-col justify-center gap-0.5 border-b px-4">
+      <img
+        src="/logo.png"
+        alt="CuboSites"
+        className="h-7 w-auto max-w-[10.5rem] object-contain object-left"
+      />
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        Super Admin
       </div>
     </div>
   );
@@ -75,22 +123,45 @@ function AdminLayout() {
   const unread = useData((s) => s.notifications.filter((n) => !n.read).length);
 
   useEffect(() => {
-    const s = getSession();
-    if (!s) nav({ to: "/login" });
-    setSession(s);
+    let cancelled = false;
+    (async () => {
+      const ok = apiEnabled ? await restoreAdminSession() : Boolean(getSession());
+      if (cancelled) return;
+      if (!ok) {
+        nav({ to: "/login" });
+        setSession(null);
+        return;
+      }
+      try {
+        await hydrateAdminStore();
+      } catch {
+        toast.error("Could not load admin data from API");
+      }
+      if (!cancelled) setSession(getSession());
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [nav]);
 
   if (!session) {
-    return <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">Checking admin session…</div>;
+    return (
+      <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">
+        Checking admin session…
+      </div>
+    );
   }
-  const title = [...NAV].reverse().find((n) => (n.to === "/" ? path === "/" : path.startsWith(n.to)))?.label ?? "Admin";
+  const title =
+    [...NAV].reverse().find((n) => (n.to === "/" ? path === "/" : path.startsWith(n.to)))?.label ??
+    "Admin";
 
   return (
     <div className="flex min-h-screen w-full">
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r bg-sidebar lg:flex">
         <Brand />
-        <div className="flex-1 overflow-y-auto"><NavList /></div>
-        <div className="border-t p-3 text-[11px] text-muted-foreground">Demo build · mock data only</div>
+        <div className="flex-1 overflow-y-auto">
+          <NavList />
+        </div>
       </aside>
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-64 bg-sidebar p-0">
@@ -102,25 +173,47 @@ function AdminLayout() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b bg-card/95 px-3 backdrop-blur sm:px-5">
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu className="h-5 w-5" /></Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open navigation"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
           <div className="truncate text-sm font-semibold">{title}</div>
-          <span className="hidden rounded border border-warning/30 bg-warning/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-warning sm:inline">Demo mode</span>
-          <form className="ml-auto hidden md:block" onSubmit={(e) => { e.preventDefault(); nav({ to: "/contractors", search: { q } }); }}>
+          <form
+            className="ml-auto hidden md:block"
+            onSubmit={(e) => {
+              e.preventDefault();
+              nav({ to: "/contractors", search: { q } });
+            }}
+          >
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search contractors…" className="h-9 w-64 pl-8" />
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search contractors…"
+                className="h-9 w-64 pl-8"
+              />
             </div>
           </form>
           <Button variant="ghost" size="icon" className="relative ml-auto md:ml-0" asChild>
             <Link to="/notifications" aria-label="Notifications">
               <Bell className="h-5 w-5" />
-              {unread > 0 && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />}
+              {unread > 0 && (
+                <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive" />
+              )}
             </Link>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-9 gap-2 px-2">
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">PA</span>
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-xs font-semibold text-accent-foreground">
+                  PA
+                </span>
                 <span className="hidden text-sm sm:inline">{session.name}</span>
               </Button>
             </DropdownMenuTrigger>
@@ -128,28 +221,56 @@ function AdminLayout() {
               <DropdownMenuLabel>
                 <div className="text-sm">{session.name}</div>
                 <div className="text-xs font-normal text-muted-foreground">{session.email}</div>
-                <div className="mt-1 text-[11px] font-normal text-muted-foreground">Session since {fmtDateTime(session.loginAt)}</div>
+                <div className="mt-1 text-[11px] font-normal text-muted-foreground">
+                  Session since {fmtDateTime(session.loginAt)}
+                </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => nav({ to: "/settings" })}><Settings className="h-4 w-4" />Profile & settings</DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setConfirmReset(true)}><RotateCcw className="h-4 w-4" />Reset demo data</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => nav({ to: "/settings" })}>
+                <Settings className="h-4 w-4" />
+                Profile & settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => setConfirmReset(true)}>
+                <RotateCcw className="h-4 w-4" />
+                Reset demo data
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => { actions.logAuth("auth.logout"); demoLogout(); nav({ to: "/login" }); }}><LogOut className="h-4 w-4" />Log out</DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => {
+                  actions.logAuth("auth.logout");
+                  demoLogout();
+                  nav({ to: "/login" });
+                }}
+              >
+                <LogOut className="h-4 w-4" />
+                Log out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
-        <main className="min-w-0 flex-1 p-3 sm:p-5"><Outlet /></main>
+        <main className="min-w-0 flex-1 p-3 sm:p-5">
+          <Outlet />
+        </main>
       </div>
 
       <AlertDialog open={confirmReset} onOpenChange={setConfirmReset}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Reset demo data?</AlertDialogTitle>
-            <AlertDialogDescription>All demo changes saved in this browser will be replaced with the original sample data.</AlertDialogDescription>
+            <AlertDialogDescription>
+              All demo changes saved in this browser will be replaced with the original sample data.
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { actions.resetDemo(); toast.success("Demo data reset"); }}>Reset</AlertDialogAction>
+            <AlertDialogAction
+              onClick={() => {
+                actions.resetDemo();
+                toast.success("Demo data reset");
+              }}
+            >
+              Reset
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

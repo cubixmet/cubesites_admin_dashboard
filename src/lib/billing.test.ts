@@ -1,13 +1,31 @@
 import { describe, expect, it } from "vitest";
-import { averageStorageMb, computeTax, prorationCharge, siteCharge, staffCharge, storageCharge } from "./billing";
+import {
+  averageStorageMb,
+  computeTax,
+  prorationCharge,
+  siteCharge,
+  staffCharge,
+  storageCharge,
+} from "./billing";
 import type { PricingVersion, TaxRule } from "./types";
 
 const p: PricingVersion = {
-  id: "pv", effectiveFrom: "2026-01-01", siteRate: 109, freeSites: 3, staffRate: 29, freeStaff: 1,
-  storageFreeMb: 250, storageBlockMb: 250, storageBlockRate: 5, billingDays: 30, createdBy: "t", createdAt: "", note: "",
+  id: "pv",
+  effectiveFrom: "2026-01-01",
+  siteRate: 109,
+  freeSites: 3,
+  staffRate: 29,
+  freeStaff: 1,
+  storageFreeMb: 250,
+  storageBlockMb: 250,
+  storageBlockRate: 5,
+  billingDays: 30,
+  createdBy: "t",
+  createdAt: "",
+  note: "",
 };
 
-describe("CubeSites pricing rules", () => {
+describe("CuboSites pricing rules", () => {
   it("first 3 active sites are free, then ₹109 each", () => {
     expect(siteCharge(3, p).amount).toBe(0);
     expect(siteCharge(5, p).amount).toBe(218);
@@ -30,7 +48,16 @@ describe("CubeSites pricing rules", () => {
     expect(prorationCharge(10, p).amount).toBe(36.33);
   });
   it("applies exclusive and inclusive tax", () => {
-    const rule: TaxRule = { id: "t", name: "GST", rate: 18, inclusive: false, appliesTo: ["site"], effectiveFrom: "2026-01-01", invoiceLabel: "", registration: "" };
+    const rule: TaxRule = {
+      id: "t",
+      name: "GST",
+      rate: 18,
+      inclusive: false,
+      appliesTo: ["site"],
+      effectiveFrom: "2026-01-01",
+      invoiceLabel: "",
+      registration: "",
+    };
     const lines = [{ type: "site" as const, description: "", qty: 1, unitPrice: 100, amount: 100 }];
     expect(computeTax(lines, rule).total).toBe(118);
     expect(computeTax(lines, { ...rule, inclusive: true }).tax).toBe(15.25);

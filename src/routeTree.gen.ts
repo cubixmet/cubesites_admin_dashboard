@@ -21,6 +21,7 @@ import { Route as AdminStaffRouteImport } from './routes/_admin/staff'
 import { Route as AdminStorageRouteImport } from './routes/_admin/storage'
 import { Route as AdminSubscriptionsRouteImport } from './routes/_admin/subscriptions'
 import { Route as AdminTaxRouteImport } from './routes/_admin/tax'
+import { Route as AdminWalletsRouteImport } from './routes/_admin/wallets'
 import { Route as AdminBackupsIndexRouteImport } from './routes/_admin/backups.index'
 import { Route as AdminBackupsIdRouteImport } from './routes/_admin/backups.$id'
 import { Route as AdminContractorsIndexRouteImport } from './routes/_admin/contractors.index'
@@ -87,6 +88,11 @@ const AdminTaxRoute = AdminTaxRouteImport.update({
   path: '/tax',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminWalletsRoute = AdminWalletsRouteImport.update({
+  id: '/wallets',
+  path: '/wallets',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminBackupsIndexRoute = AdminBackupsIndexRouteImport.update({
   id: '/backups/',
   path: '/backups/',
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/storage': typeof AdminStorageRoute
   '/subscriptions': typeof AdminSubscriptionsRoute
   '/tax': typeof AdminTaxRoute
+  '/wallets': typeof AdminWalletsRoute
   '/backups/$id': typeof AdminBackupsIdRoute
   '/contractors/$id': typeof AdminContractorsIdRoute
   '/support/$id': typeof AdminSupportIdRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/storage': typeof AdminStorageRoute
   '/subscriptions': typeof AdminSubscriptionsRoute
   '/tax': typeof AdminTaxRoute
+  '/wallets': typeof AdminWalletsRoute
   '/': typeof AdminIndexRoute
   '/backups/$id': typeof AdminBackupsIdRoute
   '/contractors/$id': typeof AdminContractorsIdRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/_admin/storage': typeof AdminStorageRoute
   '/_admin/subscriptions': typeof AdminSubscriptionsRoute
   '/_admin/tax': typeof AdminTaxRoute
+  '/_admin/wallets': typeof AdminWalletsRoute
   '/_admin/': typeof AdminIndexRoute
   '/_admin/backups/$id': typeof AdminBackupsIdRoute
   '/_admin/contractors/$id': typeof AdminContractorsIdRoute
@@ -191,6 +200,7 @@ export interface FileRouteTypes {
     | '/storage'
     | '/subscriptions'
     | '/tax'
+    | '/wallets'
     | '/backups/$id'
     | '/contractors/$id'
     | '/support/$id'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/storage'
     | '/subscriptions'
     | '/tax'
+    | '/wallets'
     | '/'
     | '/backups/$id'
     | '/contractors/$id'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/_admin/storage'
     | '/_admin/subscriptions'
     | '/_admin/tax'
+    | '/_admin/wallets'
     | '/_admin/'
     | '/_admin/backups/$id'
     | '/_admin/contractors/$id'
@@ -329,6 +341,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTaxRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/wallets': {
+      id: '/_admin/wallets'
+      path: '/wallets'
+      fullPath: '/wallets'
+      preLoaderRoute: typeof AdminWalletsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/backups/': {
       id: '/_admin/backups/'
       path: '/backups'
@@ -384,6 +403,7 @@ interface AdminRouteChildren {
   AdminStorageRoute: typeof AdminStorageRoute
   AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
   AdminTaxRoute: typeof AdminTaxRoute
+  AdminWalletsRoute: typeof AdminWalletsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminBackupsIdRoute: typeof AdminBackupsIdRoute
   AdminContractorsIdRoute: typeof AdminContractorsIdRoute
@@ -403,6 +423,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminStorageRoute: AdminStorageRoute,
   AdminSubscriptionsRoute: AdminSubscriptionsRoute,
   AdminTaxRoute: AdminTaxRoute,
+  AdminWalletsRoute: AdminWalletsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminBackupsIdRoute: AdminBackupsIdRoute,
   AdminContractorsIdRoute: AdminContractorsIdRoute,

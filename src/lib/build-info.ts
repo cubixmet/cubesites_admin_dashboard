@@ -7,7 +7,7 @@ export type BuildInfo = {
 
 /** Build stamp baked into the JS bundle at compile time. */
 export const CLIENT_BUILD: BuildInfo = {
-  app: import.meta.env.VITE_APP_NAME || "cubesites-admin",
+  app: import.meta.env.VITE_APP_NAME || "cubosites-admin",
   version: import.meta.env.VITE_APP_VERSION || "0.0.0",
   buildNumber: import.meta.env.VITE_BUILD_NUMBER || "dev",
   builtAt: import.meta.env.VITE_BUILT_AT || "",
